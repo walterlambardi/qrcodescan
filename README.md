@@ -17,3 +17,4 @@ as this project isn't using expo and you will need to make sure the native side 
 - vision-camera-dynamsoft-barcode-reader
 - patch-package
 - postinstall-postinstall
+- @react-native-async-storage/async-storage
