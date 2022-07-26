@@ -12,3 +12,8 @@ as this project isn't using expo and you will need to make sure the native side 
 - react-navigation
 - react-native-paper
 - react-native-vector-icons
+- react-native-reanimated
+- react-native-vision-camera
+- vision-camera-dynamsoft-barcode-reader
+- patch-package
+- postinstall-postinstall
