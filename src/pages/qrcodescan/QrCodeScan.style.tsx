@@ -24,21 +24,6 @@ export default StyleSheet.create({
   snackbarText: {
     color: '#000',
   },
-  msgTitle: {
-    color: '#000',
-    fontSize: metrics.getScaledRoundedValue(20),
-    lineHeight: metrics.getScaledRoundedValue(25),
-    fontWeight: '600',
-  },
-  msgSubtitle: {
-    color: '#333',
-    fontSize: metrics.getScaledRoundedValue(14),
-    lineHeight: metrics.getScaledRoundedValue(20),
-    marginBottom: metrics.getScaledRoundedValue(35),
-  },
-  tryAgainBtn: {
-    marginTop: metrics.getScaledRoundedValue(20),
-  },
   control: {
     flexDirection: 'row',
     position: 'absolute',
@@ -58,4 +43,9 @@ export default StyleSheet.create({
     flexDirection: 'row',
   },
   snackbarWrapper: { top: 0 },
+  processingQrCode: {
+    fontSize: metrics.getScaledRoundedValue(18),
+    color: 'white',
+    textAlign: 'center',
+  },
 });

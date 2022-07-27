@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { IRecord } from '../pages/qrcodescan/QrCodeScan';
 
 export const saveInStorage = async (key: string, value: any) => {
   try {
@@ -24,5 +25,21 @@ export const deleteFromStorage = async (key: string) => {
     return true;
   } catch (e) {
     console.log(`deleteFromStorage: ${e}`);
+  }
+};
+
+export const saveRecord = async (record: IRecord) => {
+  try {
+    let jsonValue = await AsyncStorage.getItem('records');
+    //@ts-ignore
+    let records: IRecord[] = JSON.parse(jsonValue);
+    if (!records) {
+      const arrNew = [{ record }];
+      return await AsyncStorage.setItem('records', JSON.stringify(arrNew));
+    }
+    const newArry = [...records, record];
+    return await AsyncStorage.setItem('records', JSON.stringify(newArry));
+  } catch (e) {
+    console.log(`saveRecord: ${e}`);
   }
 };

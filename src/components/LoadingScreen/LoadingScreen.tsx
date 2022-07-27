@@ -4,10 +4,12 @@ import styles from './LoadingScreen.style';
 import { ActivityIndicator } from 'react-native-paper';
 import metrics from '../../utils/metrics';
 
-export default function LoadingScreen() {
+const LoadingScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ActivityIndicator size={metrics.getScaledRoundedValue(40)} />
     </SafeAreaView>
   );
-}
+};
+
+export default LoadingScreen;

@@ -3,8 +3,10 @@ import React, { useContext } from 'react';
 import { Pages } from '../../enum/Pages';
 import routes from '../routes';
 import PageStyle from '../options/PageStyle';
-import { Button } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import { AuthContext } from '../../context/AuthContext';
+import { useNetInfo } from '@react-native-community/netinfo';
+import { StyleSheet, View } from 'react-native';
 
 export type AppStackParams = {
   [Pages.HOME]: undefined;
@@ -14,6 +16,7 @@ export type AppStackParams = {
 const Stack = createStackNavigator<AppStackParams>();
 
 const MainStack: React.FC = () => {
+  const netInfo = useNetInfo();
   const { dispatch } = useContext(AuthContext);
   return (
     <Stack.Navigator screenOptions={PageStyle}>
@@ -23,13 +26,20 @@ const MainStack: React.FC = () => {
         options={{
           title: 'Home',
           headerRight: () => (
-            <Button
-              icon="logout"
-              color="white"
-              onPress={() => dispatch({ type: 'REMOVE_USERNAME' })}
-              mode="text">
-              {'Sign Out'}
-            </Button>
+            <View style={styles.rowDirection}>
+              <IconButton
+                icon={netInfo?.isConnected ? 'wifi' : 'wifi-off'}
+                color={'white'}
+                size={20}
+                onPress={() => console.log('Pressed')}
+              />
+              <IconButton
+                icon={'logout'}
+                color={'white'}
+                size={20}
+                onPress={() => dispatch({ type: 'REMOVE_USERNAME' })}
+              />
+            </View>
           ),
         }}
       />
@@ -38,10 +48,25 @@ const MainStack: React.FC = () => {
         component={routes[Pages.QRCODE_SCAN]}
         options={{
           title: 'QR Code Scan',
+          headerRight: () => (
+            <IconButton
+              icon={netInfo?.isConnected ? 'wifi' : 'wifi-off'}
+              color={'white'}
+              size={20}
+              onPress={() => console.log('Pressed')}
+            />
+          ),
         }}
       />
     </Stack.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  rowDirection: {
+    flexDirection: 'row',
+    alignContent: 'center',
+  },
+});
 
 export default MainStack;
