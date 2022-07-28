@@ -241,22 +241,6 @@ const QrCodeScan: React.FC = () => {
           {barcodeResults[0]?.barcodeText}
         </Text>
       </Snackbar>
-
-      <Snackbar
-        visible={!!barcodeResults[0]?.barcodeText && !isActive && !isProcessing}
-        onDismiss={toggleCameraStatus}
-        style={styles.snackbar}
-        duration={10000}
-        wrapperStyle={styles.snackbarWrapper}
-        action={{
-          label: 'close',
-          color: '#000',
-          onPress: () => toggleCameraStatus(),
-        }}>
-        <Text style={styles.snackbarText}>
-          {barcodeResults[0]?.barcodeText}
-        </Text>
-      </Snackbar>
     </SafeAreaView>
   );
 };
