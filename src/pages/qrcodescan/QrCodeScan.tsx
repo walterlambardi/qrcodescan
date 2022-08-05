@@ -35,8 +35,6 @@ export interface IRecord {
 }
 
 const QrCodeScan: React.FC = () => {
-  const mounted = REA.useSharedValue(true);
-  const regionEnabledShared = REA.useSharedValue(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
@@ -46,8 +44,7 @@ const QrCodeScan: React.FC = () => {
   const devices = useCameraDevices();
   const backCam = devices.back;
   const netInfo = useNetInfo();
-  const { batchCompleted, setBatchCompleted } = useQrCodeBatch();
-
+  const { batchCompleted } = useQrCodeBatch();
   const {
     state: { username },
   } = useContext(AuthContext);
@@ -60,13 +57,6 @@ const QrCodeScan: React.FC = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    mounted.value = true;
-    return () => {
-      mounted.value = false;
-    };
-  });
-
   const hasInternet = useMemo(() => netInfo.isConnected, [netInfo]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,32 +65,11 @@ const QrCodeScan: React.FC = () => {
   };
 
   const onBarcodeScanned = (results: TextResult[]) => {
-    if (mounted.value) {
+    if (results.length > 0) {
       setBarcodeResults(results);
-      if (results.length > 0) {
-        setIsActive(false);
-      }
+      setIsActive(false);
     }
   };
-
-  const format = useMemo(() => {
-    const desiredWidth = 1280;
-    const desiredHeight = 720;
-    let selectedCam = backCam;
-    if (selectedCam) {
-      for (let index = 0; index < selectedCam.formats.length; index++) {
-        const camFormat = selectedCam.formats[index];
-        if (
-          camFormat.videoWidth === desiredWidth &&
-          camFormat.videoHeight === desiredHeight
-        ) {
-          return camFormat;
-        }
-      }
-    }
-    return undefined;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const frameProcessor = useFrameProcessor(frame => {
     'worklet';
@@ -108,31 +77,6 @@ const QrCodeScan: React.FC = () => {
     config.template =
       '{"ImageParameter":{"BarcodeFormatIds":["BF_QR_CODE"],"Description":"","Name":"Settings"},"Version":"3.0"}';
     config.isFront = useFrontShared.value;
-    if (regionEnabledShared.value) {
-      let settings;
-      if (config.template) {
-        settings = JSON.parse(config.template);
-      } else {
-        const template = `{
-          "ImageParameter": {
-            "Name": "Settings"
-          },
-          "Version": "3.0"
-        }`;
-        settings = JSON.parse(template);
-      }
-      settings.ImageParameter.RegionDefinitionNameArray = ['Settings'];
-      settings.RegionDefinition = {
-        Left: 10,
-        Right: 90,
-        Top: 20,
-        Bottom: 65,
-        MeasuredByPercentage: 1,
-        Name: 'Settings',
-      };
-      config.template = JSON.stringify(settings);
-    }
-
     const results: TextResult[] = decode(frame, config);
     REA.runOnJS(onBarcodeScanned)(results);
   }, []);
@@ -147,8 +91,11 @@ const QrCodeScan: React.FC = () => {
   };
 
   const handleQrCode = useCallback(async () => {
-    if (hasInternet && username) {
-      setIsProcessing(true);
+    if (!username) {
+      return null;
+    }
+    setIsProcessing(true);
+    if (hasInternet) {
       await sendRecord({
         qrcode: barcodeResults[0]?.barcodeText,
         timestamp: new Date().getTime(),
@@ -156,19 +103,16 @@ const QrCodeScan: React.FC = () => {
       })
         .then(() => console.log('Success api request'))
         .catch(() => console.log('Error!'));
-      toggleCameraStatus();
-      setIsProcessing(false);
     }
-    if (!hasInternet && username) {
-      setIsProcessing(true);
+    if (!hasInternet) {
       await saveRecord({
         qrcode: barcodeResults[0]?.barcodeText,
         timestamp: new Date().getTime(),
         username: username,
       });
-      toggleCameraStatus();
-      setIsProcessing(false);
     }
+    toggleCameraStatus();
+    return setIsProcessing(false);
   }, [hasInternet, barcodeResults, username, toggleCameraStatus]);
 
   if (isLoading) {
@@ -195,7 +139,6 @@ const QrCodeScan: React.FC = () => {
           style={StyleSheet.absoluteFill}
           device={backCam}
           isActive={isActive}
-          format={format}
           frameProcessor={frameProcessor}
           frameProcessorFps={5}
         />
@@ -219,10 +162,7 @@ const QrCodeScan: React.FC = () => {
         </View>
       )}
 
-      <Snackbar
-        visible={batchCompleted}
-        duration={5000}
-        onDismiss={() => setBatchCompleted(false)}>
+      <Snackbar visible={batchCompleted} duration={5000} onDismiss={() => null}>
         <Text>{'QR codes were successfully sent in batch mode'}</Text>
       </Snackbar>
 
@@ -235,7 +175,7 @@ const QrCodeScan: React.FC = () => {
         action={{
           label: 'close',
           color: '#000',
-          onPress: () => toggleCameraStatus(),
+          onPress: toggleCameraStatus,
         }}>
         <Text style={styles.snackbarText}>
           {barcodeResults[0]?.barcodeText}

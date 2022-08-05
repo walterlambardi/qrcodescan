@@ -12,7 +12,7 @@ import { useQrCodeBatch } from '../../hooks/useQrCodeBatch';
 type HomeProps = NativeStackScreenProps<AppStackParams, Pages.HOME>;
 
 const Home: React.FC<HomeProps> = ({ navigation }: HomeProps) => {
-  const { batchCompleted, setBatchCompleted } = useQrCodeBatch();
+  const { batchCompleted } = useQrCodeBatch();
 
   return (
     <View style={styles.container}>
@@ -23,10 +23,7 @@ const Home: React.FC<HomeProps> = ({ navigation }: HomeProps) => {
         {'Scan QR Code'}
       </Button>
 
-      <Snackbar
-        visible={batchCompleted}
-        duration={5000}
-        onDismiss={() => setBatchCompleted(false)}>
+      <Snackbar visible={batchCompleted} duration={5000} onDismiss={() => null}>
         {'QR codes were successfully sent in batch mode'}
       </Snackbar>
     </View>

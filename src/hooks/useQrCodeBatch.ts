@@ -26,17 +26,17 @@ export const useQrCodeBatch = () => {
       setBatchCompleted(true);
       await deleteFromStorage('records');
       setTimeout(() => {
-        setBatchCompleted(false);
+        return setBatchCompleted(false);
       }, 5000);
     } else {
       console.log('Error: handleBatchRecords');
     }
   };
+  const getStoredRecords = async () => {
+    return await getFromStorage('records');
+  };
 
   useEffect(() => {
-    const getStoredRecords = async () => {
-      return await getFromStorage('records');
-    };
     if (isConnected) {
       getStoredRecords().then(
         async records => !!records && (await handleBatchRecords(records)),
@@ -44,5 +44,5 @@ export const useQrCodeBatch = () => {
     }
   }, [isConnected]);
 
-  return { batchCompleted, setBatchCompleted };
+  return { batchCompleted };
 };
